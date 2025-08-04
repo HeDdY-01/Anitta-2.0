@@ -179,7 +179,7 @@ async def advantage_spoll_choker(bot, query):
     if not movies:
         return await query.answer("You are clicking on an old button which is expired.", show_alert=True)
     movie = movies[(int(movie_))]
-    await query.answer('Checking for Movie in database...')
+    await query.answer('Checking for Movie in database...💡')
     k = await manual_filters(bot, query.message, text=movie)
     if k == False:
         files, offset, total_results = await get_search_results(movie, offset=0, filter=True)
@@ -187,30 +187,9 @@ async def advantage_spoll_choker(bot, query):
             k = (movie, files, offset, total_results)
             await auto_filter(bot, query, k)
         else:
-            k = await query.message.edit('<b>𝖳𝗁𝗂𝗌 𝗆𝗈𝗏𝗂𝖾 𝗇𝗈𝗍 𝖿𝗈𝗎𝗇𝖽 𝗂𝗇 𝖣𝖺𝗍𝖺𝖡𝖺𝗌𝖾</b>')
+            k = await query.message.edit('movie not for my database..!')
             await asyncio.sleep(10)
             await k.delete()
-
-
-@Client.on_callback_query(filters.regex(r"^pmspolling"))
-async def pm_spoll_tester(bot, query):
-    _, user, movie_ = query.data.split('#')
-    if movie_ == "close_spellcheck":
-        return await query.message.delete()
-    movies = PM_SPELL_CHECK.get(query.message.reply_to_message.id)
-    if not movies:
-        return await query.answer("You are clicking on an old button which is expired.", show_alert=True)
-    movie = movies[(int(movie_))]
-    await query.answer('Checking for Movie in database...')
-    files, offset, total_results = await get_search_results(movie, offset=0, filter=True)
-    if files:
-        k = (movie, files, offset, total_results)
-        await pm_AutoFilter(bot, query, k)
-    else:
-        k = await query.message.edit('<b>𝖳𝗁𝗂𝗌 𝗆𝗈𝗏𝗂𝖾 𝗇𝗈𝗍 𝖿𝗈𝗎𝗇𝖽 𝗂𝗇 𝖣𝖺𝗍𝖺𝖡𝖺𝗌𝖾</b>')
-        await asyncio.sleep(10)
-        await k.delete()
-        
 
 @Client.on_callback_query()
 async def cb_handler(client: Client, query: CallbackQuery):
@@ -229,19 +208,20 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     title = chat.title
                 except:
                     await query.message.edit_text("Make sure I'm present in your group!!", quote=True)
-                    return await query.answer('𝖯𝗅𝖾𝖺𝖾𝖾 𝖲𝗁𝖺𝗋𝖾 𝖠𝗇𝖽 𝖲𝗎𝗉𝗉𝗈𝗋𝗍.💞')
+                    return await query.answer('♥️hello Bro Bro Please Share And Support')
             else:
                 await query.message.edit_text(
                     "I'm not connected to any groups!\nCheck /connections or connect to any groups",
                     quote=True
                 )
-                return
+                return await query.answer('♥️hello Bro Please Share And Support')
+
         elif chat_type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
             grp_id = query.message.chat.id
             title = query.message.chat.title
 
         else:
-            return
+            return await query.answer('♥️hello Bro Please Share And Support')
 
         st = await client.get_chat_member(grp_id, userid)
         if (st.status == enums.ChatMemberStatus.OWNER) or (str(userid) in ADMINS):
@@ -266,7 +246,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 except:
                     pass
             else:
-                await query.answer("Buddy Don't Touch Others Property 😁", show_alert=True)
+                await query.answer("Buddy Don't Touch Others Property 😁!!", show_alert=True)
     elif "groupcb" in query.data:
         await query.answer()
 
@@ -278,31 +258,31 @@ async def cb_handler(client: Client, query: CallbackQuery):
         user_id = query.from_user.id
 
         if act == "":
-            stat = "𝙲𝙾𝙽𝙽𝙴𝙲𝚃"
+            stat = "CONNECT"
             cb = "connectcb"
         else:
-            stat = "𝙳𝙸𝚂𝙲𝙾𝙽𝙽𝙴𝙲𝚃"
+            stat = "DISCONNECT"
             cb = "disconnect"
 
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(f"{stat}", callback_data=f"{cb}:{group_id}"),
-             InlineKeyboardButton("𝙳𝙴𝙻𝙴𝚃𝙴", callback_data=f"deletecb:{group_id}")],
-            [InlineKeyboardButton("𝙱𝙰𝙲𝙺", callback_data="backcb")]
+             InlineKeyboardButton("DELETE", callback_data=f"deletecb:{group_id}")],
+            [InlineKeyboardButton("BACK", callback_data="backcb")]
         ])
 
         await query.message.edit_text(
-            f"𝙶𝚁𝙾𝚄𝙿 𝙽𝙰𝙼𝙴 :- **{title}**\n𝙶𝚁𝙾𝚄𝙿 𝙸𝙳 :- `{group_id}`",
+            f"Group Name : **{title}**\nGroup ID : `{group_id}`",
             reply_markup=keyboard,
             parse_mode=enums.ParseMode.MARKDOWN
         )
-        return await query.answer('𝖯𝗅𝖾𝖺𝖾𝖾 𝖲𝗁𝖺𝗋𝖾 𝖠𝗇𝖽 𝖲𝗎𝗉𝗉𝗈𝗋𝗍.💞')
+        return await query.answer('♥️hello Bro Please Share And Support')
     elif "connectcb" in query.data:
         await query.answer()
 
         group_id = query.data.split(":")[1]
 
         hr = await client.get_chat(int(group_id))
-        
+
         title = hr.title
 
         user_id = query.from_user.id
@@ -311,12 +291,12 @@ async def cb_handler(client: Client, query: CallbackQuery):
 
         if mkact:
             await query.message.edit_text(
-                f"𝙲𝙾𝙽𝙽𝙴𝙲𝚃𝙴𝙳 𝚃𝙾 **{title}**",
-                parse_mode=enums.ParseMode.MARKDOWN,
+                f"Connected to **{title}**",
+                parse_mode=enums.ParseMode.MARKDOWN
             )
         else:
-            await query.message.edit_text('Some error occurred!!', parse_mode="md")
-        return await query.answer('𝖯𝗅𝖾𝖺𝖾𝖾 𝖲𝗁𝖺𝗋𝖾 𝖠𝗇𝖽 𝖲𝗎𝗉𝗉𝗈𝗋𝗍.💞')
+            await query.message.edit_text('Some error occurred!!', parse_mode=enums.ParseMode.MARKDOWN)
+        return await query.answer('♥️hello Bro Please Share And Support')
     elif "disconnect" in query.data:
         await query.answer()
 
@@ -339,7 +319,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 f"Some error occurred!!",
                 parse_mode=enums.ParseMode.MARKDOWN
             )
-        return
+        return await query.answer('Done.!👍')
     elif "deletecb" in query.data:
         await query.answer()
 
@@ -357,7 +337,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 f"Some error occurred!!",
                 parse_mode=enums.ParseMode.MARKDOWN
             )
-        return await query.answer('𝖯𝗅𝖾𝖺𝖾𝖾 𝖲𝗁𝖺𝗋𝖾 𝖠𝗇𝖽 𝖲𝗎𝗉𝗉𝗈𝗋𝗍.💞')
+        return await query.answer('♥️hello Bro Please Share And Support')
     elif query.data == "backcb":
         await query.answer()
 
@@ -368,7 +348,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await query.message.edit_text(
                 "There are no active connections!! Connect to some groups first.",
             )
-            return await query.answer('𝖯𝗅𝖾𝖺𝖾𝖾 𝖲𝗁𝖺𝗋𝖾 𝖠𝗇𝖽 𝖲𝗎𝗉𝗉𝗈𝗋𝗍.💞')
+            return await query.answer('♥️hello Bro Please Share And Support')
         buttons = []
         for groupid in groupids:
             try:
@@ -400,52 +380,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
             alert = alerts[int(i)]
             alert = alert.replace("\\n", "\n").replace("\\t", "\t")
             await query.answer(alert, show_alert=True)
-
-    if query.data.startswith("pmfile"):
+    if query.data.startswith("file"):
         ident, file_id = query.data.split("#")
         files_ = await get_file_details(file_id)
         if not files_:
-            return await query.answer('No such file exist.')
-        files = files_[0]
-        title = files.file_name
-        size = get_size(files.file_size)
-        f_caption = files.caption
-        if CUSTOM_FILE_CAPTION:
-            try:
-                f_caption = CUSTOM_FILE_CAPTION.format(mention=query.from_user.mention, file_name='' if title is None else title, file_size='' if size is None else size, file_caption='' if f_caption is None else f_caption)                                                                                                      
-            except Exception as e:
-                logger.exception(e)
-            f_caption = f_caption
-        if f_caption is None:
-            f_caption = f"{files.file_name}"
-        try:
-            if AUTH_CHANNEL and not await is_subscribed(client, query):
-                await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
-                return            
-            else:
-                await client.send_cached_media(
-                    chat_id=query.from_user.id,
-                    file_id=file_id,
-                    caption=f_caption,
-                    protect_content=True if ident == "pmfilep" else False,
-                    reply_markup=InlineKeyboardMarkup(
-                        [[                          
-                          InlineKeyboardButton("𝖬𝗈𝗏𝗂𝖾 𝖦𝗋𝗈𝗎𝗉 1", url='https://t.me/Mallu_Movie_Hub_Group'),
-                          InlineKeyboardButton("𝖬𝗈𝗏𝗂𝖾 𝖦𝗋𝗈𝗎𝗉 2", url='https://t.me/+iEbhY7mM4oE1OTVl')
-                        ]]
-                    )
-                )                       
-        except Exception as e:
-            await query.answer(f"⚠️ Error {e}", show_alert=True)
-        
-    if query.data.startswith("file"):        
-        ident, req, file_id = query.data.split("#")
-        if BUTTON_LOCK:
-            if int(req) not in [query.from_user.id, 0]:
-                return await query.answer(BUTTON_LOCK_TEXT.format(query=query.from_user.first_name), show_alert=True)             
-        files_ = await get_file_details(file_id)
-        if not files_:
-            return await query.answer('No such file exist.')
+            return await query.answer( 'No such file exist😔. ')
         files = files_[0]
         title = files.file_name
         size = get_size(files.file_size)
@@ -453,7 +392,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
         settings = await get_settings(query.message.chat.id)
         if CUSTOM_FILE_CAPTION:
             try:
-                f_caption = CUSTOM_FILE_CAPTION.format(mention=query.from_user.mention, file_name='' if title is None else title, file_size='' if size is None else size, file_caption='' if f_caption is None else f_caption)                               
+                f_caption = CUSTOM_FILE_CAPTION.format(file_name='' if title is None else title,
+                                                       file_size='' if size is None else size,
+                                                       file_caption='' if f_caption is None else f_caption)
             except Exception as e:
                 logger.exception(e)
             f_caption = f_caption
@@ -474,10 +415,14 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     caption=f_caption,
                     protect_content=True if ident == "filep" else False,
                     reply_markup=InlineKeyboardMarkup(
-                        [[                          
-                          InlineKeyboardButton("𝖬𝗈𝗏𝗂𝖾 𝖦𝗋𝗈𝗎𝗉 1", url='https://t.me/Mallu_Movie_Hub_Group'),
-                          InlineKeyboardButton("𝖬𝗈𝗏𝗂𝖾 𝖦𝗋𝗈𝗎𝗉 2", url='https://t.me/+iEbhY7mM4oE1OTVl')
-                        ]]
+                        [
+                         [
+                          InlineKeyboardButton('💥 Gʀᴏᴜᴩ', url="https://t.me/+PmCZjkOWEXZmMDM9"),
+                          InlineKeyboardButton('Dᴇʟᴇᴛᴇ ⚠️', callback_data='close_data')
+                          ],[
+                          InlineKeyboardButton(text=f'⚙️ Fɪʟᴇ Sɪᴢᴇ 【 {size} 】⚙️', callback_data='gxneo')
+                         ]
+                        ]
                     )
                 )
                 await query.answer('Check PM, I have sent files in pm', show_alert=True)
@@ -487,7 +432,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
         except Exception as e:
             await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
-        
     elif query.data.startswith("checksub"):
         if AUTH_CHANNEL and not await is_subscribed(client, query):
             await query.answer("I Like Your Smartness, But Don't Be Oversmart Okay", show_alert=True)
@@ -495,14 +439,16 @@ async def cb_handler(client: Client, query: CallbackQuery):
         ident, file_id = query.data.split("#")
         files_ = await get_file_details(file_id)
         if not files_:
-            return await query.answer('No such file exist.')
+            return await query.answer('No such file exist.😬.')
         files = files_[0]
         title = files.file_name
         size = get_size(files.file_size)
         f_caption = files.caption
         if CUSTOM_FILE_CAPTION:
             try:
-               f_caption = CUSTOM_FILE_CAPTION.format(mention=query.from_user.mention, file_name='' if title is None else title, file_size='' if size is None else size, file_caption='' if f_caption is None else f_caption)  
+                f_caption = CUSTOM_FILE_CAPTION.format(file_name='' if title is None else title,
+                                                       file_size='' if size is None else size,
+                                                       file_caption='' if f_caption is None else f_caption)
             except Exception as e:
                 logger.exception(e)
                 f_caption = f_caption
@@ -515,10 +461,14 @@ async def cb_handler(client: Client, query: CallbackQuery):
             caption=f_caption,
             protect_content=True if ident == 'checksubp' else False,
             reply_markup=InlineKeyboardMarkup(
-                [[                          
-                  InlineKeyboardButton("𝖬𝗈𝗏𝗂𝖾 𝖦𝗋𝗈𝗎𝗉 1", url='https://t.me/Mallu_Movie_Hub_Group'),
-                  InlineKeyboardButton("𝖬𝗈𝗏𝗂𝖾 𝖦𝗋𝗈𝗎𝗉 2", url='https://t.me/+iEbhY7mM4oE1OTVl')
-                ]]
+                [
+                 [
+                  InlineKeyboardButton('💥 Gʀᴏᴜᴩ', url="https://t.me/+PmCZjkOWEXZmMDM9"),
+                  InlineKeyboardButton('Dᴇʟᴇᴛᴇ ⚠️', callback_data='close_data')
+                  ],[
+                  InlineKeyboardButton(text=f'⚙️ Fɪʟᴇ Sɪᴢᴇ 【 {size} 】⚙️', callback_data='gxneo')
+                 ]
+                ]
             )
         )
     elif query.data == "pages":
