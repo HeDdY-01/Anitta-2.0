@@ -18,11 +18,19 @@ from utils import get_size, is_subscribed, get_poster, search_gagala, temp, get_
 from database.users_chats_db import db
 from database.ia_filterdb import Media, get_file_details, get_search_results
 from database.filters_mdb import (
-    del_all,
-    find_filter,
+    del_all,    find_filter,
     get_filters,
 )
 import logging
+
+def stylish_text(text):
+    mapping = {"M": "𝙼", "B": "𝙱", "K": "𝙺", "G": "𝙶"}
+    return "".join(mapping.get(c, c) for c in text)
+
+def stylish_size(size_bytes):
+    size_num = round(size_bytes / (1024*1024))
+    size_unit = "MB"
+    return f"{size_num} {stylish_text(size_unit)}"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
@@ -39,80 +47,35 @@ async def give_filter(client, message):
     if k == False:
         await auto_filter(client, message)
 
-
 @Client.on_message(filters.private & filters.text & filters.incoming)
-async def pv_filter(client, message):
-    kd = await global_filters(client, message)
-    if kd == False:
-        await auto_filter(client, message)
-        
-@Client.on_callback_query(filters.regex(r"^pmnext"))
-async def pm_next_page(bot, query):
-    ident, req, key, offset = query.data.split("_")
-    try:
-        offset = int(offset)
-    except:
-        offset = 0
-    search = PM_BUTTONS.get(key)
-    if not search:
-        await query.answer("You are using one of my old messages, please send the request again.", show_alert=True)
-        return
-
-    files, n_offset, total = await get_search_results(search, offset=offset, filter=True)
-    try:
-        n_offset = int(n_offset)
-    except:
-        n_offset = 0
-
-    if not files:
-        return
-    
-    btn = [[InlineKeyboardButton(text=f"📁 {get_size(file.file_size)} 🔺 {file.file_name}", callback_data=f'pmfile#{file.file_id}')] for file in files ]
-                
-    if 0 < offset <= 10:
-        off_set = 0
-    elif offset == 0:
-        off_set = None
-    else:
-        off_set = offset - 10
-    if n_offset == 0:
-        btn.append(
-            [InlineKeyboardButton("≼ 𝖡𝖺𝖼𝗄", callback_data=f"pmnext_{req}_{key}_{off_set}"),
-             InlineKeyboardButton(f"💠 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)}", callback_data="pages")]                                  
-        )
-    elif off_set is None:
-        btn.append(
-            [InlineKeyboardButton(f"💠 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)}", callback_data="pages"),
-             InlineKeyboardButton("𝖭𝖾𝗑𝗍 ≽", callback_data=f"pmnext_{req}_{key}_{n_offset}")])
-    else:
-        btn.append(
-            [
-                InlineKeyboardButton("≼ 𝖡𝖺𝖼𝗄", callback_data=f"pmnext_{req}_{key}_{off_set}"),
-                InlineKeyboardButton(f"💠 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)}", callback_data="pages"),
-                InlineKeyboardButton("𝖭𝖾𝗑𝗍 ≽", callback_data=f"pmnext_{req}_{key}_{n_offset}")
-            ],
-        )
-    try:
-        await query.edit_message_reply_markup(
-            reply_markup=InlineKeyboardMarkup(btn)
-        )
-    except MessageNotModified:
-        pass
-    await query.answer()
+async def pm_text(bot, message):
+    content = message.text
+    user = message.from_user.first_name
+    user_id = message.from_user.id
+    if content.startswith("/") or content.startswith("#"): return  # ignore commands and hashtags
+    if user_id in ADMINS: return # ignore admins
+    await message.reply_text(
+         text=f"<b>❝ ഇവിടെ ചോദിച്ചാൽ സിനിമ കിട്ടില്ല ഗ്രൂപ്പിൽ മാത്രം സിനിമ ചോദിക്കുക..!!\n\n❝ Group or bot any promblem or bugs contact group owner = @TG_x_filter!!!</b>",   
+         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔍 Cʟɪᴄᴋ ᴛᴏ Sᴇᴀʀᴄʜ", url=f"https://t.me/Mallu_Movie_Hub_Group")]])
+    )
+    await bot.send_message(
+        chat_id=LOG_CHANNEL,
+        text=f"<b>#PM_MSG\n\n★Name : {user}\n\n★ID : {user_id}\n\n★Message : {content}</b>"
+    ) 
 
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
     ident, req, key, offset = query.data.split("_")
     if int(req) not in [query.from_user.id, 0]:
-        return await query.answer("oKda", show_alert=True)
+        return await query.answer(f"മോനെ {query.from_user.first_name} ഇത് നിനക്കുലതല്ല 🤭\n\n{query.message.reply_to_message.from_user.first_name} ന്റെ റിക്വസ്റ്റ് ആണ് ഇത് 🙂\n\nRequest your own😘\n\n© Cinemaflix™", show_alert=True)
     try:
         offset = int(offset)
     except:
         offset = 0
     search = BUTTONS.get(key)
     if not search:
-        await query.answer("You are using one of my old messages, please send the request again.", show_alert=True)
+        await query.answer("അല്ലയോ മഹാൻ താങ്കൾ ക്ലിക്ക് ചെയ്തത് പഴയ മെസ്സേജ് ആണ് വേണമെങ്കിൽ ഒന്നും കൂടെ റിക്വസ്റ്റ് ചെയ് 😉\n\nYou are using this for one of my old message, please send the request again.", show_alert=True)
         return
 
     files, n_offset, total = await get_search_results(search, offset=offset, filter=True)
@@ -124,12 +87,11 @@ async def next_page(bot, query):
     if not files:
         return
     settings = await get_settings(query.message.chat.id)
-    nxreq  = query.from_user.id if query.from_user else 0
     if settings['button']:
         btn = [
             [
                 InlineKeyboardButton(
-                    text=f"📁 {get_size(file.file_size)} 🔺 {file.file_name}", callback_data=f'files#{nxreq}#{file.file_id}'
+                    text=f"〶 {get_size(file.file_size)} {file.file_name}", callback_data=f'files#{file.file_id}'
                 ),
             ]
             for file in files
@@ -138,28 +100,22 @@ async def next_page(bot, query):
         btn = [
             [
                 InlineKeyboardButton(
-                    text=f"🔺 {file.file_name}", callback_data=f'files#{nxreq}#{file.file_id}'
+                    text=f"{file.file_name}", callback_data=f'files#{file.file_id}'
                 ),
                 InlineKeyboardButton(
-                    text=f"📁 {get_size(file.file_size)}",
-                    callback_data=f'files#{nxreq}#{file.file_id}',
+                    text=f" {get_size(file.file_size)}",
+                    callback_data=f'files_#{file.file_id}',
                 ),
             ]
-            for file in files
-        ]
-        
+           for file in files
+        ] 
+
     btn.insert(0, 
         [
-            InlineKeyboardButton(f'🔍 {search} ', 'dupe')
+            InlineKeyboardButton(f'🎬 {search} 🎬', 'dupe')     
         ]
     )
-    btn.insert(1,
-        [
-            InlineKeyboardButton("⦿ 𝖢𝗁𝖾𝖼𝗄 𝖡𝗈𝗍 𝖯𝗆 ", url=f"https://t.me/{temp.U_NAME}"),
-            InlineKeyboardButton(" 𝖬𝗈𝗏𝗂𝖾 𝖴𝗉𝖽𝖺𝗍𝖾 ⦿", url="https://t.me/cinema_flix_updates")
-        ]
-    )    
-
+    
     if 0 < offset <= 10:
         off_set = 0
     elif offset == 0:
@@ -168,20 +124,21 @@ async def next_page(bot, query):
         off_set = offset - 10
     if n_offset == 0:
         btn.append(
-            [InlineKeyboardButton("≼ 𝖡𝖺𝖼𝗄", callback_data=f"next_{req}_{key}_{off_set}"),
-             InlineKeyboardButton(f"💠 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)}",
-                                  callback_data="pages")]
+            [InlineKeyboardButton("⭅ Bᴀᴄᴋ", callback_data=f"next_{req}_{key}_{off_set}"),
+             InlineKeyboardButton(f"| {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)} |", callback_data="pages"),
+             InlineKeyboardButton("Dᴇʟᴇᴛᴇ 🗑️", callback_data="close_data")]
         )
     elif off_set is None:
         btn.append(
-            [InlineKeyboardButton(f"💠 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)}", callback_data="pages"),
-             InlineKeyboardButton("𝖭𝖾𝗑𝗍 ≽", callback_data=f"next_{req}_{key}_{n_offset}")])
+            [InlineKeyboardButton("❖ Pᴀɢᴇꜱ", callback_data="pages"),
+             InlineKeyboardButton(f"| {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)} |", callback_data="pages"),
+             InlineKeyboardButton("Nᴇxᴛ ⇛", callback_data=f"next_{req}_{key}_{n_offset}")])
     else:
         btn.append(
             [
-                InlineKeyboardButton("≼ 𝖡𝖺𝖼𝗄", callback_data=f"next_{req}_{key}_{off_set}"),
-                InlineKeyboardButton(f"💠 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)}", callback_data="pages"),
-                InlineKeyboardButton("𝖭𝖾𝗑𝗍 ≽", callback_data=f"next_{req}_{key}_{n_offset}")
+                InlineKeyboardButton("⭅ Bᴀᴄᴋ", callback_data=f"next_{req}_{key}_{off_set}"),
+                InlineKeyboardButton(f"| {math.ceil(int(offset) / 10) + 1} / {math.ceil(total / 10)} |", callback_data="pages"),
+                InlineKeyboardButton("Nᴇxᴛ ⇛", callback_data=f"next_{req}_{key}_{n_offset}")
             ],
         )
     try:
