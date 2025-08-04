@@ -35,8 +35,19 @@ def stylish_text(text):
     return "".join(mapping.get(c, c) for c in text)
 
 def stylish_size(size_bytes):
-    size_num = round(size_bytes / (1024*1024))
-    size_unit = "MB"
+    if size_bytes >= 1024 * 1024 * 1024:
+        size_num = round(size_bytes / (1024 * 1024 * 1024), 2)
+        size_unit = "GB"
+    elif size_bytes >= 1024 * 1024:
+        size_num = round(size_bytes / (1024 * 1024), 2)
+        size_unit = "MB"
+    elif size_bytes >= 1024:
+        size_num = round(size_bytes / 1024, 2)
+        size_unit = "KB"
+    else:
+        size_num = size_bytes
+        size_unit = "B"
+
     return f"{size_num} {stylish_text(size_unit)}"
 
 logger = logging.getLogger(__name__)
