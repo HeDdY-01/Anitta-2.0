@@ -61,7 +61,6 @@ def stylish_numbers(text):
     }
     return ''.join(mapping.get(c, c) for c in text)
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
