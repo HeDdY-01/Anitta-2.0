@@ -52,7 +52,7 @@ def stylish_size(size_bytes):
     size_num = stylish_numbers(str(size_num))
     size_unit = stylish_text(size_unit)
 
-    return f"{size_num} {size_unit}""
+    return f"{size_num} {size_unit}"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
