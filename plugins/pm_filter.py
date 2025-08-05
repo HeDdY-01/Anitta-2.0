@@ -59,7 +59,7 @@ def stylish_numbers(text):
         '0': '𝟶', '1': '𝟷', '2': '𝟸', '3': '𝟹', '4': '𝟺',
         '5': '𝟻', '6': '𝟼', '7': '𝟽', '8': '𝟾', '9': '𝟿'
         '.': '●':
-    }
+}
     return ''.join(mapping.get(c, c) for c in text)
 
 logger = logging.getLogger(__name__)
