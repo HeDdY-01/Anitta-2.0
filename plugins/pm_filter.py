@@ -1522,9 +1522,7 @@ async def global_filters(client, message, text=False):
                 break
     else:
         return False
-
-    from pyrogram import Client, filters
-
+        
 @Client.on_message(filters.private & filters.command("start"))
 async def start_message(client, message):
     lang = message.from_user.language_code
@@ -1534,3 +1532,22 @@ async def start_message(client, message):
         await message.reply_text("स्वागत है!")
     else:
         await message.reply_text("Welcome!")
+
+delete_after = 120  # seconds
+
+@Client.on_message(filters.private & (filters.document | filters.video | filters.audio | filters.photo))
+async def auto_delete_pm_files(client, message):
+    lang = message.from_user.language_code
+    # Language-specific reply before deletion (optional)
+    if lang == "ml":
+        await message.reply_text("ഫയൽ ഡിലീറ്റ് ചെയ്യപ്പെടും 120 സെക്കൻഡ് കഴിഞ്ഞ്.")
+    elif lang == "hi":
+        await message.reply_text("फ़ाइल 120 सेकंड बाद हटाई जाएगी।")
+    else:
+        await message.reply_text("File will be deleted after 120 seconds.")
+
+    await asyncio.sleep(delete_after)
+    try:
+        await message.delete()
+    except Exception as e:
+        print(f"Error deleting message: {e}")
