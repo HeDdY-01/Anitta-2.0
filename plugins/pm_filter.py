@@ -1522,3 +1522,15 @@ async def global_filters(client, message, text=False):
                 break
     else:
         return False
+
+    from pyrogram import Client, filters
+
+@Client.on_message(filters.private & filters.command("start"))
+async def start_message(client, message):
+    lang = message.from_user.language_code
+    if lang == "ml":
+        await message.reply_text("സ്വാഗതം!")
+    elif lang == "hi":
+        await message.reply_text("स्वागत है!")
+    else:
+        await message.reply_text("Welcome!")
